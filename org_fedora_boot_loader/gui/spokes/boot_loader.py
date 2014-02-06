@@ -28,6 +28,10 @@ from pyanaconda.ui.gui.categories.system import SystemCategory
 
 from gi.repository import Gtk
 
+import string
+import crypt
+import random
+
 # export only the spoke, no helper functions, classes or constants
 __all__ = ["BootLoaderSpoke"]
 
@@ -76,8 +80,15 @@ class BootLoaderSpoke(NormalSpoke):
         self._pw_changed = False
 
     def apply(self):
-        if self._pw_changed:
-            self.data.bootloader.password = self._pwEntry.get_text()
+        if not self._pw_changed:
+            return
+
+        pw = self._pwEntry.get_text()
+        if pw:
+            self.data.bootloader.password = self._encrypt_password(pw)
+            self.data.bootloader.isCrypted = True
+        else:
+            self.data.bootloader.password = ""
             self.data.bootloader.isCrypted = False
 
     def execute(self):
@@ -106,6 +117,14 @@ class BootLoaderSpoke(NormalSpoke):
         else:
             return _("Boot loader password not set")
 
+    def _encrypt_password(self, pw):
+        salt = "$6$"
+        salt_len = 16
+        salt_chars = string.letters + string.digits + './'
+
+        rand_gen = random.SystemRandom()
+        salt += "".join(rand_gen.choice(salt_chars) for i in range(salt_len))
+        return crypt.crypt(pw, salt)
 
     ### handlers ###
     def on_pw_focus_in(self, *args):
