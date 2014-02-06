@@ -78,6 +78,7 @@ class BootLoaderSpoke(NormalSpoke):
     def apply(self):
         if self._pw_changed:
             self.data.bootloader.password = self._pwEntry.get_text()
+            self.data.bootloader.isCrypted = False
 
     def execute(self):
         # nothing to do here
