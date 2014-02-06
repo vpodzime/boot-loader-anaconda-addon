@@ -77,10 +77,7 @@ class BootLoaderSpoke(NormalSpoke):
 
     def apply(self):
         if self._pw_changed:
-            print "Changing the password"
             self.data.bootloader.password = self._pwEntry.get_text()
-        else:
-            print "Not changing the password"
 
     def execute(self):
         # nothing to do here
